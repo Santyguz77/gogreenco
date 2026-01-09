@@ -818,29 +818,51 @@
 				).join('\n');
 				const moreItems = order.items.length > 2 ? `\n+${order.items.length - 2} productos más` : '';
 				
-				const notification = new Notification("🔔 Nuevo Pedido - Go Green", {
+				const notificationOptions = {
 					body: `Cliente: ${orderLabel}\n${itemsText}${moreItems}\n\nTotal: ${Utils.formatCurrency(order.total)}`,
 					icon: "/image.png",
 					badge: "/icon-192.png",
 					tag: `order-${order.id}`,
 					requireInteraction: true, // En móvil, mantiene la notificación hasta que el usuario interactúe
 					silent: false,
+					vibrate: [200, 100, 200],
 					timestamp: Date.now(),
 					data: { orderId: order.id, section: 'orders' }
-				});
-
-				notification.onclick = () => {
-					window.focus();
-					showSection('orders');
-					notification.close();
 				};
 
-				// En desktop, auto cerrar después de 15 segundos
-				// En móvil con requireInteraction=true, el usuario debe cerrarla
-				if (!('ontouchstart' in window)) {
-					setTimeout(() => notification.close(), 15000);
+				// Usar Service Worker para mostrar notificaciones en móviles
+				if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+					// Enviar mensaje al Service Worker para mostrar la notificación
+					navigator.serviceWorker.controller.postMessage({
+						type: 'SHOW_NOTIFICATION',
+						title: '🔔 Nuevo Pedido - Go Green',
+						options: notificationOptions
+					});
+				} else {
+					// Fallback: notificación directa (para desktop o si SW no está disponible)
+					const notification = new Notification("🔔 Nuevo Pedido - Go Green", notificationOptions);
+
+					notification.onclick = () => {
+						window.focus();
+						showSection('orders');
+						notification.close();
+					};
+
+					// En desktop, auto cerrar después de 15 segundos
+					if (!('ontouchstart' in window)) {
+						setTimeout(() => notification.close(), 15000);
+					}
 				}
 			}
+		}
+
+		// Escuchar mensajes del Service Worker
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.addEventListener('message', event => {
+				if (event.data && event.data.type === 'NAVIGATE_TO_ORDERS') {
+					showSection('orders');
+				}
+			});
 		}
 
 		// Solicitar permiso de notificaciones al cargar
@@ -851,13 +873,25 @@
 				if (shouldAsk) {
 					const permission = await Notification.requestPermission();
 					if (permission === "granted") {
-						// Mostrar notificación de prueba
-						const testNotif = new Notification("✅ Notificaciones Activadas", {
+						// Mostrar notificación de prueba usando Service Worker
+						const testOptions = {
 							body: "Recibirás alertas de nuevos pedidos en tiempo real",
 							icon: "/image.png",
-							badge: "/icon-192.png"
-						});
-						setTimeout(() => testNotif.close(), 3000);
+							badge: "/icon-192.png",
+							requireInteraction: false,
+							vibrate: [200, 100, 200]
+						};
+
+						if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+							navigator.serviceWorker.controller.postMessage({
+								type: 'SHOW_NOTIFICATION',
+								title: '✅ Notificaciones Activadas',
+								options: testOptions
+							});
+						} else {
+							const testNotif = new Notification("✅ Notificaciones Activadas", testOptions);
+							setTimeout(() => testNotif.close(), 3000);
+						}
 					}
 				}
 			}, 5000); // Esperar 5 segundos después de cargar para no ser intrusivo
@@ -2871,15 +2905,27 @@
 						navigator.vibrate([200, 100, 200, 100, 200]);
 					}
 					
-					const testNotif = new Notification("✅ ¡Notificaciones Activadas!", {
+					const testOptions = {
 						body: "Recibirás alertas de nuevos pedidos en tiempo real, incluso cuando la app esté en segundo plano.",
 						icon: "/image.png",
 						badge: "/icon-192.png",
 						tag: "test-notification",
-						requireInteraction: false
-					});
-					
-					setTimeout(() => testNotif.close(), 5000);
+						requireInteraction: false,
+						vibrate: [200, 100, 200, 100, 200]
+					};
+
+					// Usar Service Worker si está disponible
+					if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+						navigator.serviceWorker.controller.postMessage({
+							type: 'SHOW_NOTIFICATION',
+							title: '✅ ¡Notificaciones Activadas!',
+							options: testOptions
+						});
+					} else {
+						// Fallback: notificación directa
+						const testNotif = new Notification("✅ ¡Notificaciones Activadas!", testOptions);
+						setTimeout(() => testNotif.close(), 5000);
+					}
 				} else if (permission === "denied") {
 					alert("❌ Has bloqueado las notificaciones.\n\nPara activarlas:\n1. Ve a configuración del navegador\n2. Busca 'Notificaciones' o 'Permisos'\n3. Permite notificaciones para este sitio");
 				}

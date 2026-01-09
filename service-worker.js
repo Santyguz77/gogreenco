@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gogreen-v18-system-notifications';
+const CACHE_NAME = 'gogreen-v20-splash-screen';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -58,6 +58,43 @@ self.addEventListener('fetch', event => {
       .catch(() => {
         // Si falla la red, intentar desde caché
         return caches.match(event.request);
+      })
+  );
+});
+
+// Escuchar mensajes para mostrar notificaciones
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
+    const { title, options } = event.data;
+    
+    self.registration.showNotification(title, options);
+  }
+});
+
+// Manejar clics en notificaciones
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  
+  // Abrir o enfocar la ventana de la aplicación
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then(clientList => {
+        // Si hay una ventana abierta, enfocarla
+        for (let client of clientList) {
+          if (client.url.includes('index.html') && 'focus' in client) {
+            return client.focus().then(client => {
+              // Enviar mensaje para mostrar la sección de pedidos
+              client.postMessage({
+                type: 'NAVIGATE_TO_ORDERS'
+              });
+              return client;
+            });
+          }
+        }
+        // Si no hay ventana abierta, abrir una nueva
+        if (clients.openWindow) {
+          return clients.openWindow('/index.html');
+        }
       })
   );
 });
