@@ -80,6 +80,7 @@
 			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 			gap: 20px;
 			margin-bottom: 30px;
+			overflow: hidden;
 		}
 		.stat-card {
 			background: linear-gradient(135deg, var(--panel), var(--card));
@@ -87,6 +88,8 @@
 			border-radius: 12px;
 			box-shadow: 0 4px 12px rgba(45, 105, 67, 0.1);
 			border: 1px solid rgba(45, 105, 67, 0.1);
+			min-width: 0;
+			overflow: hidden;
 		}
 		.stat-card h3 {
 			font-size: 14px;
@@ -98,6 +101,9 @@
 			font-size: 36px;
 			font-weight: 700;
 			color: var(--accent);
+			word-break: break-word;
+			overflow-wrap: break-word;
+			max-width: 100%;
 		}
 		.section {
 			display: none;
@@ -294,25 +300,25 @@
 				</div>
 
 				<!-- Gráficas -->
-			<div class="charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 20px; margin-top: 20px;">
+			<div class="charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 20px; margin-top: 20px; overflow: hidden;">
 				<div class="card">
 					<h3 style="margin-bottom: 20px;">📈 Ventas Últimos 7 Días</h3>
-					<canvas id="sales-chart" style="max-height: 250px;"></canvas>
+					<canvas id="sales-chart" style="max-height: 250px; max-width: 100%;"></canvas>
 				</div>
 
 				<div class="card">
 					<h3 style="margin-bottom: 20px;">🏆 Productos Más Vendidos</h3>
-					<canvas id="products-chart" style="max-height: 250px;"></canvas>
+					<canvas id="products-chart" style="max-height: 250px; max-width: 100%;"></canvas>
 				</div>
 
-						<h3 style="margin-bottom: 20px;">📊 Evolución Mensual</h3>
-						<canvas id="monthly-chart" style="max-height: 250px;"></canvas>
-					</div>
+				<div class="card">
+					<h3 style="margin-bottom: 20px;">📊 Evolución Mensual</h3>
+					<canvas id="monthly-chart" style="max-height: 250px; max-width: 100%;"></canvas>
+				</div>
 
-					<div class="card">
-						<h3 style="margin-bottom: 20px;">🏷️ Categorías Más Vendidas</h3>
-						<canvas id="category-chart" style="max-height: 250px;"></canvas>
-					</div>
+				<div class="card">
+					<h3 style="margin-bottom: 20px;">🏷️ Categorías Más Vendidas</h3>
+					<canvas id="category-chart" style="max-height: 250px; max-width: 100%;"></canvas>
 				</div>
 			</div>
 
