@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gogreen-v12-metrics-fix';
+const CACHE_NAME = 'gogreen-v18-system-notifications';
 const urlsToCache = [
   '/',
   '/index.html',

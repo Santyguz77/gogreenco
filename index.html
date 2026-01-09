@@ -428,6 +428,31 @@
 				</div>
 
 				<div class="card" style="margin-bottom: 20px;">
+					<h3 style="color: var(--accent); margin-bottom: 15px;">🔔 Notificaciones</h3>
+					<p style="color: var(--muted); margin-bottom: 20px;">
+						Configura las alertas de nuevos pedidos en tu dispositivo móvil o computadora.
+					</p>
+					
+					<div style="background: var(--panel); border: 2px solid var(--accent); padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+						<div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+							<span style="font-size: 40px;">📱</span>
+							<div style="flex: 1;">
+								<h4 style="color: var(--accent); margin-bottom: 5px;">Notificaciones Push del Sistema</h4>
+								<p style="color: var(--muted); font-size: 14px; margin: 0;">
+									Recibe alertas como las de WhatsApp o YouTube directamente en tu dispositivo, incluso cuando la app esté en segundo plano.
+								</p>
+							</div>
+						</div>
+						
+						<div id="notification-status" style="padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px;"></div>
+						
+						<button class="btn" onclick="enableNotifications()" id="enable-notifications-btn" style="width: 100%;">
+							🔔 Activar Notificaciones
+						</button>
+					</div>
+				</div>
+
+				<div class="card" style="margin-bottom: 20px;">
 					<h3 style="color: #ff4444; margin-bottom: 15px;">⚠️ Zona de Peligro</h3>
 					<p style="color: var(--muted); margin-bottom: 20px;">
 						Estas acciones son <strong>irreversibles</strong>. Úsalas con precaución.
@@ -599,6 +624,8 @@
 			renderDashboard();
 			renderAllSections();
 			startAutoRefresh();
+			// Actualizar estado de notificaciones
+			updateNotificationStatus();
 		}
 		
 		// Auto-actualización cada 5 segundos
@@ -765,23 +792,41 @@
 		async function requestBrowserNotification(order, orderLabel) {
 			// Verificar si el navegador soporta notificaciones
 			if (!("Notification" in window)) {
+				console.log('Notificaciones no soportadas en este navegador');
 				return;
 			}
 
 			// Solicitar permiso si no se ha hecho
 			if (Notification.permission === "default") {
-				await Notification.requestPermission();
+				const permission = await Notification.requestPermission();
+				if (permission === "denied") {
+					console.log('Permiso de notificaciones denegado');
+					return;
+				}
 			}
 
 			// Mostrar notificación si tenemos permiso
 			if (Notification.permission === "granted") {
-				const notification = new Notification("🛍️ Nuevo Pedido - Go Green", {
-					body: `Cliente: ${orderLabel}\nTotal: ${Utils.formatCurrency(order.total)}`,
+				// Vibración en dispositivos móviles
+				if ('vibrate' in navigator) {
+					navigator.vibrate([200, 100, 200]); // Patrón de vibración
+				}
+
+				// Construir cuerpo del mensaje con productos
+				const itemsText = order.items.slice(0, 2).map(item => 
+					`• ${item.quantity}x ${item.name}`
+				).join('\n');
+				const moreItems = order.items.length > 2 ? `\n+${order.items.length - 2} productos más` : '';
+				
+				const notification = new Notification("🔔 Nuevo Pedido - Go Green", {
+					body: `Cliente: ${orderLabel}\n${itemsText}${moreItems}\n\nTotal: ${Utils.formatCurrency(order.total)}`,
 					icon: "/image.png",
-					badge: "/image.png",
-					tag: order.id,
-					requireInteraction: false,
-					silent: false
+					badge: "/icon-192.png",
+					tag: `order-${order.id}`,
+					requireInteraction: true, // En móvil, mantiene la notificación hasta que el usuario interactúe
+					silent: false,
+					timestamp: Date.now(),
+					data: { orderId: order.id, section: 'orders' }
 				});
 
 				notification.onclick = () => {
@@ -790,16 +835,32 @@
 					notification.close();
 				};
 
-				// Auto cerrar después de 10 segundos
-				setTimeout(() => notification.close(), 10000);
+				// En desktop, auto cerrar después de 15 segundos
+				// En móvil con requireInteraction=true, el usuario debe cerrarla
+				if (!('ontouchstart' in window)) {
+					setTimeout(() => notification.close(), 15000);
+				}
 			}
 		}
 
 		// Solicitar permiso de notificaciones al cargar
 		if ("Notification" in window && Notification.permission === "default") {
-			setTimeout(() => {
-				Notification.requestPermission();
-			}, 3000); // Esperar 3 segundos después de cargar
+			setTimeout(async () => {
+				// Mostrar un mensaje amigable antes de solicitar permiso
+				const shouldAsk = confirm("🔔 ¿Deseas recibir notificaciones de nuevos pedidos en tu dispositivo?\n\nEsto te permitirá estar al tanto incluso cuando la app esté en segundo plano.");
+				if (shouldAsk) {
+					const permission = await Notification.requestPermission();
+					if (permission === "granted") {
+						// Mostrar notificación de prueba
+						const testNotif = new Notification("✅ Notificaciones Activadas", {
+							body: "Recibirás alertas de nuevos pedidos en tiempo real",
+							icon: "/image.png",
+							badge: "/icon-192.png"
+						});
+						setTimeout(() => testNotif.close(), 3000);
+					}
+				}
+			}, 5000); // Esperar 5 segundos después de cargar para no ser intrusivo
 		}
 
 		// SISTEMA DE NOTIFICACIONES DE COCINA
@@ -2790,6 +2851,99 @@
 			if (confirm('¿Cerrar sesión?')) {
 				localStorage.removeItem('userSession');
 				window.location.href = '/login.html';
+			}
+		}
+
+		// Función para activar notificaciones manualmente
+		async function enableNotifications() {
+			if (!("Notification" in window)) {
+				alert("❌ Tu navegador no soporta notificaciones del sistema.");
+				return;
+			}
+
+			try {
+				const permission = await Notification.requestPermission();
+				updateNotificationStatus();
+				
+				if (permission === "granted") {
+					// Mostrar notificación de prueba con vibración
+					if ('vibrate' in navigator) {
+						navigator.vibrate([200, 100, 200, 100, 200]);
+					}
+					
+					const testNotif = new Notification("✅ ¡Notificaciones Activadas!", {
+						body: "Recibirás alertas de nuevos pedidos en tiempo real, incluso cuando la app esté en segundo plano.",
+						icon: "/image.png",
+						badge: "/icon-192.png",
+						tag: "test-notification",
+						requireInteraction: false
+					});
+					
+					setTimeout(() => testNotif.close(), 5000);
+				} else if (permission === "denied") {
+					alert("❌ Has bloqueado las notificaciones.\n\nPara activarlas:\n1. Ve a configuración del navegador\n2. Busca 'Notificaciones' o 'Permisos'\n3. Permite notificaciones para este sitio");
+				}
+			} catch (error) {
+				console.error('Error al solicitar permiso de notificaciones:', error);
+				alert("❌ Error al activar notificaciones. Intenta de nuevo.");
+			}
+		}
+
+		// Función para actualizar el estado visual de las notificaciones
+		function updateNotificationStatus() {
+			const statusDiv = document.getElementById('notification-status');
+			const button = document.getElementById('enable-notifications-btn');
+			
+			if (!statusDiv || !button) return;
+
+			if (!("Notification" in window)) {
+				statusDiv.innerHTML = `
+					<div style="background: rgba(255, 68, 68, 0.1); border-left: 4px solid #ff4444; padding: 10px;">
+						❌ Tu navegador no soporta notificaciones del sistema
+					</div>
+				`;
+				button.style.display = 'none';
+				return;
+			}
+
+			const permission = Notification.permission;
+
+			if (permission === "granted") {
+				statusDiv.innerHTML = `
+					<div style="background: rgba(76, 175, 80, 0.1); border-left: 4px solid #4caf50; padding: 10px;">
+						✅ <strong>Notificaciones Activadas</strong><br>
+						<span style="color: var(--muted); font-size: 13px;">
+							Recibirás alertas en tiempo real de nuevos pedidos
+						</span>
+					</div>
+				`;
+				button.textContent = "✅ Notificaciones Activas";
+				button.disabled = true;
+				button.style.opacity = "0.6";
+			} else if (permission === "denied") {
+				statusDiv.innerHTML = `
+					<div style="background: rgba(255, 68, 68, 0.1); border-left: 4px solid #ff4444; padding: 10px;">
+						❌ <strong>Notificaciones Bloqueadas</strong><br>
+						<span style="color: var(--muted); font-size: 13px;">
+							Debes habilitarlas desde la configuración del navegador
+						</span>
+					</div>
+				`;
+				button.textContent = "🔒 Desbloquear en Configuración";
+				button.disabled = true;
+				button.style.opacity = "0.6";
+			} else {
+				statusDiv.innerHTML = `
+					<div style="background: rgba(212, 168, 150, 0.1); border-left: 4px solid var(--beige); padding: 10px;">
+						⚠️ <strong>Notificaciones No Configuradas</strong><br>
+						<span style="color: var(--muted); font-size: 13px;">
+							Haz clic en el botón para activarlas
+						</span>
+					</div>
+				`;
+				button.textContent = "🔔 Activar Notificaciones";
+				button.disabled = false;
+				button.style.opacity = "1";
 			}
 		}
 
