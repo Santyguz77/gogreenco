@@ -1667,9 +1667,12 @@
 					<div style="text-align: right; font-size: 20px; font-weight: 700; color: var(--success); margin-top: 10px;">
 						Total: ${Utils.formatCurrency(order.total)}
 					</div>
-					<div style="margin-top: 15px; display: flex; gap: 10px;">
+					<div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
 						<button class="btn btn-success" onclick="completeOrder('${order.id}')">✓ Completar y Facturar</button>
 						<button class="btn btn-danger" onclick="cancelOrder('${order.id}')">✕ Cancelar</button>
+						${order.customerData && order.customerData.phone ? `
+							<button class="btn" style="background: #25D366; color: white; border: none;" onclick="contactCustomerWhatsApp('${order.id}')">💬 Contactar Cliente</button>
+						` : ''}
 					</div>
 				</div>
 			`;
@@ -1806,6 +1809,45 @@
 			isCancellingOrder = false;
 			startAutoRefresh();
 		}
+	}
+
+	// Contactar cliente por WhatsApp
+	function contactCustomerWhatsApp(orderId) {
+		const order = AppState.orders.find(o => o.id === orderId);
+		if (!order || !order.customerData || !order.customerData.phone) {
+			alert('⚠️ No hay número de teléfono para este pedido');
+			return;
+		}
+
+		const customer = order.customerData;
+		// Limpiar número de teléfono (quitar espacios, guiones, paréntesis)
+		const phone = customer.phone.replace(/[\s\-\(\)]/g, '');
+		
+		// Crear mensaje personalizado
+		const orderDate = new Date(order.timestamp).toLocaleDateString('es-CO', {
+			day: 'numeric',
+			month: 'long',
+			year: 'numeric'
+		});
+		
+		const productsText = order.items.map(item => 
+			`- ${item.name} x${item.quantity} (${Utils.formatCurrency(item.price * item.quantity)})`
+		).join('\n');
+		
+		const message = `¡Hola ${customer.name}! 👋\n\n` +
+			`Te escribimos de *Go Green - Moda Circular* 🌿\n\n` +
+			`Queremos confirmar tu pedido del ${orderDate}:\n\n` +
+			productsText + '\n\n' +
+			`*Total: ${Utils.formatCurrency(order.total)}*\n\n` +
+			`Dirección de entrega: ${customer.address || 'No especificada'}\n\n` +
+			`¿Todo está correcto? ¿Tienes alguna pregunta? 😊`;
+		
+		// Codificar mensaje para URL
+		const encodedMessage = encodeURIComponent(message);
+		
+		// Abrir WhatsApp
+		const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodedMessage}`;
+		window.open(whatsappUrl, '_blank');
 	}
 
 	// MENÚ CONFIG
