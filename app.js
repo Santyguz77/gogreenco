@@ -103,9 +103,11 @@ const Utils = {
 	},
 	
 	formatCurrency(amount) {
-		return new Intl.NumberFormat('es-MX', {
+		return new Intl.NumberFormat('es-CO', {
 			style: 'currency',
-			currency: 'MXN'
+			currency: 'COP',
+			minimumFractionDigits: 0,
+			maximumFractionDigits: 0
 		}).format(amount);
 	},
 	
