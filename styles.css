@@ -104,6 +104,8 @@ body {
 	flex: 1;
 	margin-left: 260px;
 	padding: 30px;
+	overflow-x: hidden;
+	max-width: 100%;
 }
 
 .header {
@@ -128,6 +130,8 @@ body {
 	box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 	border: 1px solid rgba(255, 255, 255, 0.2);
 	margin-bottom: 20px;
+	overflow: hidden;
+	max-width: 100%;
 }
 
 /* Buttons */
@@ -219,6 +223,77 @@ tr:hover {
 	background: rgba(45, 105, 67, 0.05);
 }
 
+@media (max-width: 768px) {
+	.table-scroll {
+		overflow: visible;
+	}
+
+	.table-scroll table {
+		display: block;
+		min-width: 0;
+	}
+
+	.table-scroll thead {
+		display: none;
+	}
+
+	.table-scroll tbody {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.table-scroll tr {
+		display: flex;
+		flex-direction: column;
+		background: linear-gradient(135deg, var(--panel), var(--card));
+		border: 1px solid rgba(45, 105, 67, 0.1);
+		border-radius: 14px;
+		padding: 16px;
+		box-shadow: 0 6px 18px rgba(45, 105, 67, 0.12);
+	}
+
+	.table-scroll td {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		padding: 8px 0;
+		border: 0;
+	}
+
+	.table-scroll td:first-child {
+		padding-top: 0;
+	}
+
+	.table-scroll td:last-child {
+		padding-bottom: 0;
+	}
+
+	.table-scroll td::before {
+		content: attr(data-label);
+		font-weight: 600;
+		font-size: 11px;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		color: var(--muted);
+	}
+
+	.table-scroll td[data-label="Acciones"],
+	.table-scroll td[data-label="Visible en Catálogo"],
+	.table-scroll td[data-label="Estado"] {
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.table-scroll td[data-label="Acciones"]::before,
+	.table-scroll td[data-label="Visible en Catálogo"]::before,
+	.table-scroll td[data-label="Estado"]::before {
+		flex: 1 0 100%;
+	}
+}
+
 /* Forms */
 input, textarea, select {
 	width: 100%;
@@ -270,16 +345,17 @@ input:focus, textarea:focus, select:focus {
 	display: flex;
 }
 
-.modal .panel {
-	width: 90%;
-	max-width: 700px;
-	max-height: 90vh;
+	width: min(700px, calc(100vw - 48px));
+	max-height: calc(100vh - 96px);
+	max-height: calc(100dvh - 96px);
 	overflow: auto;
 	background: linear-gradient(135deg, #ffffff, #f5f3f0);
 	padding: 30px;
-	border-radius: 12px;
+	border-radius: 18px;
 	box-shadow: 0 8px 32px rgba(45, 105, 67, 0.3);
 	border: 2px solid var(--accent);
+	display: flex;
+	flex-direction: column;
 }
 
 .modal-header {
@@ -310,6 +386,50 @@ input:focus, textarea:focus, select:focus {
 
 .modal-close:hover {
 	color: var(--accent);
+}
+
+@media (max-width: 640px) {
+	.modal .panel {
+		width: calc(100vw - 24px);
+		max-height: calc(100vh - 24px);
+		max-height: calc(100dvh - 24px);
+		padding: 20px 18px 24px;
+		border-radius: 16px;
+	}
+
+	.modal-header {
+		position: sticky;
+		top: 0;
+		padding-bottom: 12px;
+		margin-bottom: 16px;
+		background: linear-gradient(135deg, #ffffff, #f5f3f0);
+		z-index: 1;
+	}
+
+	.modal-header h3 {
+		font-size: 20px;
+	}
+
+	.modal-close {
+		width: 36px;
+		height: 36px;
+		font-size: 26px;
+	}
+
+	.modal .panel .form-row {
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.modal .panel .controls {
+		flex-direction: column;
+		width: 100%;
+	}
+
+	.modal .panel .controls .btn {
+		width: 100%;
+		justify-content: center;
+	}
 }
 
 /* Badges */
@@ -538,12 +658,20 @@ input:focus, textarea:focus, select:focus {
 		gap: 10px !important;
 	}
 	
+	.stat-card {
+		min-width: 0;
+		overflow: hidden;
+	}
+	
 	.stat-card h3 {
 		font-size: 13px;
 	}
 	
 	.stat-card .value {
-		font-size: 24px;
+		font-size: 20px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 	
 	.tables-grid {
@@ -623,6 +751,11 @@ input:focus, textarea:focus, select:focus {
 	.card canvas {
 		max-height: 200px !important;
 	}
+	
+	/* Grid de gráficas en mobile */
+	.charts-grid {
+		grid-template-columns: 1fr !important;
+	}
 }
 
 @media (max-width: 480px) {
@@ -642,18 +775,31 @@ input:focus, textarea:focus, select:focus {
 	
 	.stat-card {
 		padding: 12px;
+		min-width: 0;
+		overflow: hidden;
 	}
 	
 	.stat-card h3 {
 		font-size: 11px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 	
 	.stat-card .value {
-		font-size: 20px;
+		font-size: 16px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		line-height: 1.2;
 	}
 	
 	.stat-card small {
 		font-size: 10px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: block;
 	}
 	
 	.tables-grid {
@@ -674,6 +820,12 @@ input:focus, textarea:focus, select:focus {
 	
 	.modal-header h3 {
 		font-size: 18px;
+	}
+	
+	/* Grid de gráficas en mobile pequeño */
+	.charts-grid {
+		grid-template-columns: 1fr !important;
+		gap: 15px !important;
 	}
 	
 	/* Pedidos en tiempo real más compactos */

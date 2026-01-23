@@ -31,7 +31,7 @@ const Storage = {
 const API = {
 	async getAll(table) {
 		try {
-			const response = await fetch(`${API_URL}/${table}`, { 
+			const response = await fetch(`${API_URL}/${table}`, {
 				timeout: 10000 // 10 segundos timeout
 			});
 			if (!response.ok) {
@@ -45,7 +45,7 @@ const API = {
 			throw error;
 		}
 	},
-	
+
 	async save(table, items, retries = 2) {
 		for (let i = 0; i <= retries; i++) {
 			try {
@@ -66,7 +66,7 @@ const API = {
 			}
 		}
 	},
-	
+
 	async update(table, id, item) {
 		try {
 			const response = await fetch(`${API_URL}/${table}/${id}`, {
@@ -81,7 +81,7 @@ const API = {
 			throw error;
 		}
 	},
-	
+
 	async delete(table, id) {
 		try {
 			const response = await fetch(`${API_URL}/${table}/${id}`, {
@@ -101,14 +101,16 @@ const Utils = {
 	generateId() {
 		return Date.now().toString(36) + Math.random().toString(36).substr(2);
 	},
-	
+
 	formatCurrency(amount) {
-		return new Intl.NumberFormat('es-MX', {
+		return new Intl.NumberFormat('es-CO', {
 			style: 'currency',
-			currency: 'MXN'
+			currency: 'COP',
+			minimumFractionDigits: 0,
+			maximumFractionDigits: 0
 		}).format(amount);
 	},
-	
+
 	formatDate(date) {
 		return new Intl.DateTimeFormat('es-MX', {
 			year: 'numeric',
@@ -165,7 +167,7 @@ const Utils = {
 			day: 'numeric'
 		}).format(anchor);
 	},
-	
+
 	showNotification(message, type = 'info') {
 		console.log(`[${type.toUpperCase()}] ${message}`);
 		// Solo mostrar alertas para errores críticos
@@ -202,7 +204,7 @@ async function loadInitialData() {
 		AppState.orders = await API.getAll('orders');
 		AppState.transactions = await API.getAll('transactions');
 		AppState.waiters = await API.getAll('waiters');
-		
+
 		// Intentar cargar cash_closures, si falla, usar array vacío
 		try {
 			AppState.cashClosures = await API.getAll('cash_closures');
@@ -210,7 +212,7 @@ async function loadInitialData() {
 			console.warn('⚠️ Tabla cash_closures no disponible en el servidor');
 			AppState.cashClosures = [];
 		}
-		
+
 		const configArray = await API.getAll('config');
 		AppState.config = configArray.length > 0 ? configArray[0] : {};
 	} catch (error) {
@@ -265,7 +267,7 @@ async function initializeDefaultData() {
 			await API.save('menu_items', AppState.menuItems);
 		}
 	}
-	
+
 	if (AppState.waiters.length === 0) {
 		AppState.waiters = [
 			{

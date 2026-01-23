@@ -3,237 +3,152 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="theme-color" content="#2d6943">
+	<meta name="theme-color" content="#2D5A27">
 	<link rel="manifest" href="/manifest.json">
 	<link rel="icon" type="image/png" href="/icon-192.png">
 	<link rel="apple-touch-icon" href="/icon-192.png">
-	<title>Login - Go Green</title>
+	<title>Go Green - Login</title>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+	<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+	<script>
+		tailwind.config = {
+			darkMode: "class",
+			theme: {
+				extend: {
+					colors: {
+						primary: "#2D5A27",
+						"primary-hover": "#234d32",
+						accent: "#D98E73",
+						"background-light": "#F8F9F5",
+						"surface-light": "#FFFFFF",
+						"input-light": "#F3F4F6",
+					},
+					fontFamily: {
+						sans: ["'Inter'", "sans-serif"],
+					},
+					borderRadius: {
+						DEFAULT: "0.75rem",
+						'xl': '1rem',
+						'2xl': '1.5rem',
+						'3xl': '2rem',
+					},
+					boxShadow: {
+						'soft': '0 10px 40px -10px rgba(45, 90, 39, 0.15)',
+					}
+				},
+			},
+		};
+	</script>
 	<style>
-		* {
-			margin: 0;
-			padding: 0;
-			box-sizing: border-box;
-		}
-		
-		body {
-			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-			background: linear-gradient(135deg, #2d6943 0%, #1f4a2f 50%, #d4a896 100%);
-			color: #2c2c2c;
-			min-height: 100vh;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			padding: 20px;
-			position: relative;
-			overflow: hidden;
-		}
-		
-		.login-container {
-			max-width: 420px;
-			width: 100%;
-		}
-		
-		.logo {
-			text-align: center;
-			margin-bottom: 30px;
-		}
-		
-		.logo img {
-			width: 120px;
-			height: 120px;
-			border-radius: 50%;
-			box-shadow: 0 8px 32px rgba(45, 105, 67, 0.6), 0 0 0 6px rgba(255,255,255,0.9);
-			margin-bottom: 20px;
-			border: 4px solid #2d6943;
-		}
-		
-		.logo h1 {
-			font-size: 38px;
-			color: #ffffff;
-			margin-bottom: 8px;
-			text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-			font-weight: 900;
-			letter-spacing: -1px;
-		}
-		
-		.logo p {
-			font-size: 16px;
-			color: #fef3ee;
-			font-weight: 600;
-			text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-		}
-		
-		.login-card {
-			background: rgba(255, 255, 255, 0.98);
-			padding: 40px;
-			border-radius: 20px;
-			box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-			border: 2px solid rgba(45, 105, 67, 0.3);
-			backdrop-filter: blur(10px);
-		}
-		
-		.login-tabs {
-			display: flex;
-			gap: 10px;
-			margin-bottom: 30px;
-		}
-		
-		.tab-btn {
-			flex: 1;
-			background: rgba(45, 105, 67, 0.08);
-			color: #2d6943;
-			border: 2px solid rgba(45, 105, 67, 0.3);
-			padding: 12px;
-			border-radius: 12px;
-			font-size: 15px;
-			font-weight: 700;
-			cursor: pointer;
-			transition: all 0.3s ease;
-		}
-		
-		.tab-btn:hover {
-			border-color: #2d6943;
-			background: rgba(45, 105, 67, 0.15);
-			transform: translateY(-2px);
-		}
-		
-		.tab-btn.active {
-			background: linear-gradient(135deg, #2d6943, #234d32);
-			color: #ffffff;
-			border-color: #2d6943;
-			box-shadow: 0 4px 12px rgba(45, 105, 67, 0.4);
-		}
-		
-		.form-group {
-			margin-bottom: 20px;
-		}
-		
-		.form-group label {
-			display: block;
-			margin-bottom: 8px;
-			color: #2d6943;
-			font-size: 14px;
-			font-weight: 700;
-		}
-		
-		.form-group input {
-			width: 100%;
-			padding: 14px 16px;
-			background: #ffffff;
-			border: 2px solid rgba(45, 105, 67, 0.3);
-			border-radius: 12px;
-			color: #2c2c2c;
-			font-size: 15px;
-			transition: all 0.3s ease;
-		}
-		
-		.form-group input:focus {
-			outline: none;
-			border-color: #2d6943;
-			box-shadow: 0 0 0 4px rgba(45, 105, 67, 0.15);
-		}
-		
-		.login-btn {
-			width: 100%;
-			background: linear-gradient(135deg, #2d6943, #234d32);
-			color: #ffffff;
-			border: none;
-			padding: 16px;
-			border-radius: 12px;
-			font-size: 16px;
-			font-weight: 700;
-			cursor: pointer;
-			transition: all 0.3s ease;
-			box-shadow: 0 6px 20px rgba(45, 105, 67, 0.4);
-		}
-		
-		.login-btn:hover {
-			transform: translateY(-3px);
-			box-shadow: 0 8px 24px rgba(45, 105, 67, 0.5);
-		}
-		
-		.login-btn:active {
-			transform: translateY(0);
-		}
-		
-		.error-message {
-			background: rgba(198, 93, 77, 0.15);
-			color: #c65d4d;
-			padding: 12px;
-			border-radius: 10px;
-			margin-bottom: 20px;
-			display: none;
-			border-left: 4px solid #c65d4d;
-			font-weight: 600;
-		}
-		
-		.guest-link {
-			text-align: center;
-			margin-top: 20px;
-		}
-		
-		.guest-link a {
-			color: #2d6943;
-			text-decoration: none;
-			font-size: 14px;
-			font-weight: 600;
-		}
-		
-		.guest-link a:hover {
-			text-decoration: underline;
-			color: #234d32;
-		}
-		
-		@media (max-width: 480px) {
-			.login-card {
-				padding: 30px 20px;
-			}
-			.logo h1 {
-				font-size: 24px;
-			}
-			.logo img {
-				width: 80px;
-				height: 80px;
-			}
+		body { transition: background-color 0.3s ease, color 0.3s ease; }
+		.animate-fade-in { animation: fadeIn 0.6s ease-out; }
+		@keyframes fadeIn {
+			from { opacity: 0; transform: translateY(20px); }
+			to { opacity: 1; transform: translateY(0); }
 		}
 	</style>
 </head>
-<body>
-	<div class="login-container">
-		<div class="logo">
-			<img src="image.png" alt="Logo Go Green">
-			<h1>Go Green</h1>
-			<p>Moda Circular</p>
+<body class="bg-background-light min-h-screen flex items-center justify-center font-sans antialiased text-gray-800 relative overflow-hidden">
+	<!-- Decorative blobs -->
+	<div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+	<div class="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-accent/20 rounded-full blur-3xl pointer-events-none"></div>
+	
+	<main class="w-full max-w-md px-6 py-8 flex flex-col items-center z-10 animate-fade-in">
+		<!-- Logo y Branding -->
+		<div class="flex flex-col items-center mb-10 text-center">
+			<div class="relative w-24 h-24 mb-4 rounded-full bg-white shadow-lg flex items-center justify-center overflow-hidden border-4 border-primary/20" style="padding: 4px;">
+				<img src="image.png" alt="Go Green Logo" class="w-full h-full object-cover rounded-full">
+			</div>
+			<h1 class="text-4xl font-bold text-primary mb-1 tracking-tight">
+				Go Green
+			</h1>
+			<p class="text-sm uppercase tracking-[0.2em] text-gray-500 font-medium">
+				Moda Circular
+			</p>
 		</div>
 		
-		<div class="login-card">
-			<h2 style="text-align: center; color: #2d6943; margin-bottom: 30px; font-size: 24px;">
-				⚙️ Acceso Administrativo
-			</h2>
+		<!-- Card de Login -->
+		<div class="w-full bg-surface-light rounded-3xl shadow-soft p-8 transform transition-all hover:shadow-xl">
+			<div class="flex items-center justify-center gap-2 mb-8 text-gray-700">
+				<span class="material-icons-round text-primary">admin_panel_settings</span>
+				<h2 class="text-lg font-bold">Acceso Administrativo</h2>
+			</div>
 			
-			<div id="error-message" class="error-message"></div>
+			<!-- Mensaje de error -->
+			<div id="error-message" class="hidden mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-xl">
+				<div class="flex items-center gap-2">
+					<span class="material-icons-round text-sm">error</span>
+					<span id="error-text" class="text-sm font-semibold"></span>
+				</div>
+			</div>
 			
-			<form id="login-form" onsubmit="handleLogin(event)">
-				<div class="form-group">
-					<label for="username">Usuario</label>
-					<input type="text" id="username" name="username" required autocomplete="username">
+			<form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
+				<div class="space-y-1.5">
+					<label class="block text-xs font-bold uppercase tracking-wider text-gray-500 ml-1" for="username">
+						Usuario
+					</label>
+					<div class="relative group">
+						<input 
+							class="w-full bg-input-light text-gray-900 rounded-xl px-4 py-3.5 border-none focus:ring-2 focus:ring-primary transition-all placeholder-gray-400" 
+							id="username" 
+							name="username" 
+							placeholder="Ingrese su usuario" 
+							type="text"
+							required
+							autocomplete="username"/>
+						<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
+							<span class="material-icons-round text-sm">person</span>
+						</div>
+					</div>
 				</div>
 				
-				<div class="form-group">
-					<label for="password">Contraseña</label>
-					<input type="password" id="password" name="password" required autocomplete="current-password">
+				<div class="space-y-1.5">
+					<label class="block text-xs font-bold uppercase tracking-wider text-gray-500 ml-1" for="password">
+						Contraseña
+					</label>
+					<div class="relative group">
+						<input 
+							class="w-full bg-input-light text-gray-900 rounded-xl px-4 py-3.5 border-none focus:ring-2 focus:ring-primary transition-all placeholder-gray-400" 
+							id="password" 
+							name="password" 
+							placeholder="••••••••" 
+							type="password"
+							required
+							autocomplete="current-password"/>
+						<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
+							<span class="material-icons-round text-sm">lock</span>
+						</div>
+					</div>
 				</div>
 				
-				<button type="submit" class="login-btn" id="login-btn">
-					🔐 Iniciar Sesión
+				<div class="pt-2"></div>
+				
+				<button 
+					class="w-full bg-primary hover:bg-primary-hover text-white font-semibold py-4 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-all transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" 
+					type="submit"
+					id="login-btn">
+					<span class="material-icons-round text-lg">lock_open</span>
+					<span>Iniciar Sesión</span>
 				</button>
 			</form>
 			
-			<div class="guest-link">
-				<a href="/catalogo.html">👗 Ver Catálogo (sin iniciar sesión)</a>
+			<div class="mt-8 pt-6 border-t border-gray-100 text-center">
+				<a class="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-medium text-sm transition-colors group" href="/catalogo.html">
+					<span class="p-1.5 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
+						<span class="material-icons-round text-base align-middle">checkroom</span>
+					</span>
+					Ver Catálogo (sin iniciar sesión)
+				</a>
 			</div>
 		</div>
-	</div>
+		
+		<footer class="mt-12 text-center opacity-60">
+			<p class="text-xs text-gray-500">
+				© 2026 Go Green. Todos los derechos reservados.
+			</p>
+		</footer>
+	</main>
 
 	<script>
 		// Credenciales por defecto (en producción deberían estar en el backend)
@@ -245,12 +160,18 @@
 		
 		function showError(message) {
 			const errorDiv = document.getElementById('error-message');
-			errorDiv.textContent = message;
-			errorDiv.style.display = 'block';
+			const errorText = document.getElementById('error-text');
+			errorText.textContent = message;
+			errorDiv.classList.remove('hidden');
+			
+			// Auto-ocultar después de 4 segundos
+			setTimeout(() => {
+				errorDiv.classList.add('hidden');
+			}, 4000);
 		}
 		
 		function hideError() {
-			document.getElementById('error-message').style.display = 'none';
+			document.getElementById('error-message').classList.add('hidden');
 		}
 		
 		function handleLogin(event) {
@@ -259,28 +180,48 @@
 			
 			const username = document.getElementById('username').value;
 			const password = document.getElementById('password').value;
+			const btn = document.getElementById('login-btn');
 			
-			if (username === credentials.username && password === credentials.password) {
-				// Guardar sesión en localStorage
-				localStorage.setItem('userSession', JSON.stringify({
-					type: 'admin',
-					username: username,
-					loginTime: new Date().toISOString()
-				}));
-				
-				// Redirigir
-				window.location.href = credentials.redirect;
-			} else {
-				showError('❌ Usuario o contraseña incorrectos');
-			}
+			// Deshabilitar botón durante el proceso
+			btn.disabled = true;
+			btn.innerHTML = '<span class="material-icons-round text-lg animate-spin">sync</span><span>Verificando...</span>';
+			
+			// Simular delay de autenticación
+			setTimeout(() => {
+				if (username === credentials.username && password === credentials.password) {
+					// Guardar sesión en localStorage
+					localStorage.setItem('userSession', JSON.stringify({
+						type: 'admin',
+						username: username,
+						loginTime: new Date().toISOString()
+					}));
+					
+					// Mensaje de éxito
+					btn.innerHTML = '<span class="material-icons-round text-lg">check_circle</span><span>¡Acceso concedido!</span>';
+					btn.classList.add('bg-green-600');
+					
+					// Redirigir después de 800ms
+					setTimeout(() => {
+						window.location.href = credentials.redirect;
+					}, 800);
+				} else {
+					showError('Usuario o contraseña incorrectos');
+					btn.disabled = false;
+					btn.innerHTML = '<span class="material-icons-round text-lg">lock_open</span><span>Iniciar Sesión</span>';
+				}
+			}, 600);
 		}
 		
 		// Verificar si ya hay sesión activa
 		window.addEventListener('load', () => {
 			const session = localStorage.getItem('userSession');
 			if (session) {
-				// Si ya tiene sesión, redirigir directamente
-				// window.location.href = credentials.redirect;
+				const userData = JSON.parse(session);
+				if (userData.type === 'admin') {
+					// Si ya tiene sesión de admin, redirigir directamente
+					// Descomentar la siguiente línea para auto-redirect
+					// window.location.href = credentials.redirect;
+				}
 			}
 		});
 	</script>
